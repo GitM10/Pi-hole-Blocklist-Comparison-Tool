@@ -1,0 +1,37 @@
+#!/bin/bash
+
+# Prompt the user for the link to the blocklist
+read -p "Enter the link to the blocklist: " blocklist_link
+
+# Download the user-provided blocklist
+wget "$blocklist_link" -O user_blocklist.txt
+
+# Define the path to the Pi-hole blocklists directory
+blocklist_dir="/etc/pihole"
+
+# Create an array to store the unique domains
+unique_domains=()
+
+# Iterate through each blocklist file in the Pi-hole directory
+for blocklist_file in "$blocklist_dir"/*;
+do
+    # Skip directories
+    if [ -d "$blocklist_file" ]; then
+        continue
+    fi
+
+    # Compare the user-provided blocklist with each Pi-hole blocklist
+    diff_output=$(comm -23 <(sort user_blocklist.txt) <(sort "$blocklist_file"))
+
+    # Store the unique domains in the array
+    unique_domains+=("$diff_output")
+done
+
+# Calculate the total number of unique domains
+total_unique_domains=$(echo "${unique_domains[*]}" | tr ' ' '\n' | sort -u | wc -l)
+
+# Print the result
+echo "The user-provided blocklist contains $total_unique_domains domains not present in the Pi-hole blocklists."
+
+# Clean up by removing the user-provided blocklist file
+rm user_blocklist.txt
