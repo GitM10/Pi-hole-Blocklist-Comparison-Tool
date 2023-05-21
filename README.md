@@ -1,6 +1,6 @@
 # Raspberry
 
-This is a tool that can help you decide whether to use a blocklist with Pi-hole.
+This is a tool that can help you decide whether to use a blocklist in Pi-hole.
 
 The script prompts the user to enter the link to a blocklist.
 It downloads the blocklist using wget and saves it as user_blocklist.txt.
